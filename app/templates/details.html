@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}{{ response["name"] }}'s Details{% endblock title %}
+{% block body %}
+    <div class="container-fluid">
+        <!-- Flex container for image and name -->
+        <div class="row">
+            <!-- Image section -->
+            <div class="col-md-7 d-flex justify-content-center">
+                <img src="{{ url_for('static', filename=image_path) }}" 
+                     alt="{{ response['name'] }}"
+                     style="width: 200px; height: 200px; border-radius: 50%; border: 2px solid black; object-fit: cover;">
+            </div>
+            <!-- Name section -->
+            <div class="col-md-5 d-flex flex-column justify-content-center">
+                <div>
+                    <span class="heading" style="font-size: 23px;">Name</span><br>
+                    <span class="value" style="font-size: 23px;">{{ response["name"] }}</span>
+                </div>
+            </div>
+        </div>
+
+        <audio src="{{ url_for('static', filename=audio_path) }}" class="mt-1" autoplay controls></audio>
+
+        <!-- Description section -->
+        <div id="results" class="mt-1">
+            <div>
+                <span class="heading">Description</span><br>
+                <span class="value">{{ response["description"] }}</span>
+            </div>
+            <div>
+                <span class="heading">Type</span><br>
+                {% for t in response['type'] %}
+                    <span class="value ms-1" style="border: 2px solid yellow; padding: 1px;"> {{ t }} </span>
+                {% endfor %}
+            </div>
+            <div>
+                <div style="width: 50%; float: left;">
+                    <span class="heading">Weight</span><br>
+                    <span class="value">{{ response["weight"] }}</span>
+                </div>
+                <div style="width: 50%; float: right;">
+                    <span class="heading">Height</span><br>
+                    <span class="value">{{ response["height"] }}</span>
+                </div>
+            </div>
+            <div>
+                <span class="heading">Health</span><br>
+                <span class="value">{{ response["health"] }}</span>
+            </div>
+        </div>
+        <br><br><br>
+    </div>
+    <style>
+        .img-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px; /* Ensure the height matches your image height */
+        }
+        .img-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 50%;
+            border: 2px solid black;
+        }
+        .name-section {
+            display: flex;
+            align-items: center;
+        }
+        .description-section {
+            margin-top: 20px;
+        }
+        .heading {
+            color: green;
+        }
+        .value {
+            color: yellow;
+        }
+    </style>    
+{% endblock body %}

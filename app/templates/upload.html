@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% block title %}Upload Image{% endblock title %}
+{% block body %}
+    <form id="upload-form" method="POST" enctype="multipart/form-data">
+        <input type="file" name="image" id="image-input" style="display: none;">
+        <button type="submit" id="submit-btn" class="btn btn-outline-dark" style="display: none;">Find</button>
+    </form>
+
+    <!-- Camera container for video and canvas -->
+    <div class="container-fluid">
+        <div id="camera-container" style="width: 40%; float: left;">
+            <video id="video" autoplay playsinline style="width: 200px; height: 200px; border-radius: 50%; border: 2px solid black; object-fit: cover;"></video>
+            <canvas id="canvas" style="display: none; width: 200px; height: 200px; border-radius: 50%; border: 2px solid black; object-fit: cover;"></canvas>
+        </div>
+        <div id="buttons" style="width: 30%; float: right; margin-top: 10vh;">
+            <select id="camera-select"></select>
+            <button id="capture-btn" class="btn btn-outline-dark">Capture</button>
+            <button id="retake-btn" style="display:none;" class="btn btn-outline-dark">Retake</button>
+            <button id="upload-btn" style="display:none;" class="btn btn-outline-dark">Upload</button>
+        </div>
+    </div>
+    <div style="height: 300px;"></div>
+    <div class="container-fluid">
+        <span>Upload File</span>
+        <form id="uploadfile-form" method="POST" enctype="multipart/form-data">
+            <input type="file" name="image" required>
+            <button id="uploadfile-btn" type="submit" class="btn btn-outline-dark">Upload</button>
+        </form>
+    </div>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen" style="display: none;">
+        <div id="loading-spinner">
+            <!-- You can use any spinner icon or animation here -->
+            <div class="spinner"></div>
+            <p>Scanning...</p>
+        </div>
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const captureBtn = document.getElementById('capture-btn');
+        const retakeBtn = document.getElementById('retake-btn');
+        const uploadBtn = document.getElementById('upload-btn');
+        const fileInput = document.getElementById('file-input');
+        const imageInput = document.getElementById('image-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const context = canvas.getContext('2d');
+
+        let count = 1;
+        navigator.mediaDevices.enumerateDevices()
+        .then(devices => {
+            const cameras = devices.filter(device => device.kind === 'videoinput');
+            // Add a camera selection dropdown
+            const cameraSelect = document.getElementById('camera-select');
+            cameras.forEach(camera => {
+                const option = document.createElement('option');
+                option.value = camera.deviceId;
+                option.text = "Camera" + count;
+                count ++;
+                cameraSelect.appendChild(option);
+            });
+        });
+
+        let lastUsedCameraId = null;
+        // Update the camera stream when the user selects a new camera
+        document.getElementById('camera-select').addEventListener('change', () => {
+            const selectedCameraId = document.getElementById('camera-select').value;
+            lastUsedCameraId = selectedCameraId; // Store the last used camera ID
+            video.srcObject.getTracks().forEach(track => track.stop());
+            navigator.mediaDevices.getUserMedia({
+                video: {
+                deviceId: { exact: selectedCameraId }
+                }
+            })
+            .then(stream => {
+                video.srcObject = stream;
+                video.play();
+            })
+            .catch(error => {
+                console.error('Error accessing the camera', error);
+            });
+        });
+
+        // Check for mobile device
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+        if (isMobile) {
+            // Get access to the camera for mobile devices
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    video.srcObject = stream;
+                    video.play();
+                })
+                .catch(error => {
+                    console.error('Error accessing the camera', error);
+                });
+
+            captureBtn.addEventListener('click', () => {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                video.style.display = 'none';
+                canvas.style.display = 'block';
+                captureBtn.style.display = 'none';
+                retakeBtn.style.display = 'inline-block';
+                uploadBtn.style.display = 'inline-block';
+            });
+        } else {
+            // Get access to the camera
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    video.srcObject = stream;
+                })
+                .catch(error => {
+                    console.error('Error accessing the camera', error);
+                });
+
+            captureBtn.addEventListener('click', () => {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                video.style.display = 'none';
+                canvas.style.display = 'block';
+                captureBtn.style.display = 'none';
+                retakeBtn.style.display = 'inline-block';
+                uploadBtn.style.display = 'inline-block';
+            });
+        }
+
+        retakeBtn.addEventListener('click', () => {
+            if (isMobile) {
+            // Restart the camera stream for mobile devices
+                video.srcObject.getTracks().forEach(track => track.stop());
+                navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: lastUsedCameraId } } }) // Use the last used camera ID
+                .then(stream => {
+                    video.srcObject = stream;
+                    video.play();
+                })
+                .catch(error => {
+                    console.error('Error accessing the camera', error);
+                });
+                canvas.style.display = 'none';
+                video.style.display = 'block';
+                captureBtn.style.display = 'inline-block';
+                retakeBtn.style.display = 'none';
+                uploadBtn.style.display = 'none';
+            } else {
+                video.style.display = 'block';
+                canvas.style.display = 'none';
+                captureBtn.style.display = 'inline-block';
+                retakeBtn.style.display = 'none';
+                uploadBtn.style.display = 'none';
+            }
+        });
+
+        // Convert the canvas image to a Blob and submit the form
+        uploadBtn.addEventListener('click', () => {
+            canvas.toBlob(blob => {
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(new File([blob], "capture.png", { type: "image/png" }));
+                imageInput.files = dataTransfer.files;
+
+                // Store the last used camera ID
+                lastUsedCameraId = document.getElementById('camera-select').value;
+
+                // Submit the form
+                document.getElementById('upload-form').submit();
+                // Loading Screen
+                document.getElementById('loading-screen').style.display = 'flex';
+            });
+        });
+
+        // Loading Screen
+        document.getElementById("uploadfile-btn").addEventListener("click", () => {
+            document.getElementById("uploadfile-form").submit();
+            document.getElementById('loading-screen').style.display = 'flex';
+        });
+    </script>
+    
+    <style>
+        /* Loading screen styling */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        #loading-spinner {
+            text-align: center;
+        }
+        .spinner {
+            border: 8px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 8px solid #3498db;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+{% endblock body %}

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Home{% endblock title %}
+{% block body %}
+    <div class="container">
+        <div class="text-center">
+            <img src="{{ url_for('static', filename='images/pikachu.png') }}" width="200px" class="img-fluid">
+            <img src="{{ url_for('static', filename='images/pokedex.png') }}" width="350px" class="img-fluid">
+        </div>
+    </div>
+    <br><br>
+    <div class="d-flex justify-content-center">
+        <a href="{{ url_for('views.upload') }}" class="btn btn-dark">Find Pokemon</a>
+    </div>
+{% endblock body %}
