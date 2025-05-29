@@ -20,20 +20,22 @@ PROMPT = '''
             {
                 "name": "Pokémon name",
                 "description": "Brief description of the Pokémon (about 20-30 words)",
-                "health": "Health points",
                 "height": "Height in meters (include the unit, e.g., 1.5 m)",
                 "weight": "Weight in kilograms (include the unit, e.g., 50 kg)",
-                "type": ["Primary type", "Secondary type (if applicable)"]
+                "type": ["Primary type", "Secondary type (if applicable)"],
+                "evolves_from": "If applicable, name of the Pokemon which it evolves from, else NA",
+                "evolves_to": "If applicable, name of the Pokemon which it evolves to, else NA"
             }
             
             If any object in the image is not identified, return only "NA" in all fields. For example :-
             {
                 "name": "NA",
                 "description": "NA",
-                "health": "NA",
                 "height": "NA",
                 "weight": "NA",
-                "type": ["NA"]
+                "type": ["NA"],
+                "evolves_from": "NA",
+                "evolves_to": "NA"
             }
             Ensure all values are in string format and follow the JSON structure described above. Do not include any extra content or text formatting.
             You should keep in mind that you don't have to describe the pokemon according to what their significance was in the show. You should only describe their attributes.
@@ -72,7 +74,7 @@ def fetch_response(img_path, folder):
     }
 
     res = requests.post(API_URL, headers=headers, json=payload)
-    print(res)
+    print(res, res.json())
     res = res.json()["choices"][0]["message"]["content"]
     
     l, r = res.find("{"), res.rfind("}") + 1
