@@ -15,25 +15,38 @@ def home():
 def upload():
     if request.method == "POST":
         image = request.files.get("image")
-        print(image)
-        ext = image.filename.split(".")[-1]
-        if ext.lower() not in ["jpg", "jpeg", "png"]:
-            flash("Format not supported !", category="danger")
+        if not image or image.filename == "":
+            flash("No file uploaded!", category="danger")
             return redirect(url_for("views.upload"))
-        
-        counter = os.path.join(current_app.static_folder, "counter.txt")
-        with open(counter, "r") as f:
+
+        filename = image.filename
+        if "." not in filename:
+            ext = "png"
+        else:
+            ext = filename.rsplit(".", 1)[-1].lower()
+
+        if ext not in ["jpg", "jpeg", "png", "webp"]:
+            flash("Format not supported!", category="danger")
+            return redirect(url_for("views.upload"))
+
+        counter_path = os.path.join(current_app.static_folder, "counter.txt")
+        with open(counter_path, "r") as f:
             n = int(f.read())
-        with open(counter, "w") as f:
+        with open(counter_path, "w") as f:
             f.write(str(n + 1))
 
-        image_path = rf"uploaded/{n}.{ext}"
-        image.save(os.path.join(current_app.static_folder, image_path))
-        response, audio_path = fetch_response(os.path.join(current_app.static_folder, image_path), current_app.static_folder)
+        upload_dir = os.path.join(current_app.static_folder, "uploaded")
+        os.makedirs(upload_dir, exist_ok=True)
+        image_path = os.path.join(upload_dir, f"{n}.{ext}")
+        image.save(image_path)
+
+        response, audio_path = fetch_response(image_path, current_app.static_folder)
+
         session["data"] = response, image_path, audio_path
         return redirect(url_for("views.details"))
-    
+
     return render_template("upload.html")
+
 
 
 @views.route("/details")
