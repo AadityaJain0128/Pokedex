@@ -6,7 +6,6 @@
         <button type="submit" id="submit-btn" class="btn btn-outline-dark" style="display: none;">Find</button>
     </form>
 
-    <!-- Camera container for video and canvas -->
     <div class="container-fluid">
         <div id="camera-container" style="width: 40%; float: left;">
             <video id="video" autoplay playsinline style="width: 200px; height: 200px; border-radius: 50%; border: 2px solid black; object-fit: cover;"></video>
@@ -28,12 +27,10 @@
         </form>
     </div>
 
-    <!-- Loading Screen -->
     <div id="loading-screen" style="display: none;">
         <div id="loading-spinner">
-            <!-- You can use any spinner icon or animation here -->
             <div class="spinner"></div>
-            <p>Scanning...</p>
+            <p>Scanning...<br><span class="text-muted">(It may take some time to generate voice description)</span></p>
         </div>
     </div>
 
@@ -52,7 +49,6 @@
         navigator.mediaDevices.enumerateDevices()
         .then(devices => {
             const cameras = devices.filter(device => device.kind === 'videoinput');
-            // Add a camera selection dropdown
             const cameraSelect = document.getElementById('camera-select');
             cameras.forEach(camera => {
                 const option = document.createElement('option');
@@ -64,10 +60,9 @@
         });
 
         let lastUsedCameraId = null;
-        // Update the camera stream when the user selects a new camera
         document.getElementById('camera-select').addEventListener('change', () => {
             const selectedCameraId = document.getElementById('camera-select').value;
-            lastUsedCameraId = selectedCameraId; // Store the last used camera ID
+            lastUsedCameraId = selectedCameraId;
             video.srcObject.getTracks().forEach(track => track.stop());
             navigator.mediaDevices.getUserMedia({
                 video: {
@@ -83,11 +78,9 @@
             });
         });
 
-        // Check for mobile device
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
         if (isMobile) {
-            // Get access to the camera for mobile devices
             navigator.mediaDevices.getUserMedia({ video: true })
                 .then(stream => {
                     video.srcObject = stream;
@@ -108,7 +101,6 @@
                 uploadBtn.style.display = 'inline-block';
             });
         } else {
-            // Get access to the camera
             navigator.mediaDevices.getUserMedia({ video: true })
                 .then(stream => {
                     video.srcObject = stream;
@@ -131,9 +123,8 @@
 
         retakeBtn.addEventListener('click', () => {
             if (isMobile) {
-            // Restart the camera stream for mobile devices
                 video.srcObject.getTracks().forEach(track => track.stop());
-                navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: lastUsedCameraId } } }) // Use the last used camera ID
+                navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: lastUsedCameraId } } })
                 .then(stream => {
                     video.srcObject = stream;
                     video.play();
@@ -155,24 +146,19 @@
             }
         });
 
-        // Convert the canvas image to a Blob and submit the form
         uploadBtn.addEventListener('click', () => {
             canvas.toBlob(blob => {
                 const dataTransfer = new DataTransfer();
                 dataTransfer.items.add(new File([blob], "capture.png", { type: "image/png" }));
                 imageInput.files = dataTransfer.files;
 
-                // Store the last used camera ID
                 lastUsedCameraId = document.getElementById('camera-select').value;
 
-                // Submit the form
                 document.getElementById('upload-form').submit();
-                // Loading Screen
                 document.getElementById('loading-screen').style.display = 'flex';
             });
         });
 
-        // Loading Screen
         document.getElementById("uploadfile-btn").addEventListener("click", () => {
             document.getElementById("uploadfile-form").submit();
             document.getElementById('loading-screen').style.display = 'flex';
@@ -180,7 +166,6 @@
     </script>
     
     <style>
-        /* Loading screen styling */
         #loading-screen {
             position: fixed;
             top: 0;
