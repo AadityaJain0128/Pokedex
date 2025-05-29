@@ -42,9 +42,15 @@
                 </div>
             </div>
             <div>
-                <span class="heading">Health</span><br>
-                <span class="value">{{ response["health"] }}</span>
-                <br>
+                <div style="width: 50%; float: left;">
+                    <span class="heading">Evolves from</span><br>
+                    <span class="value">{{ response["evolves_from"] }}</span>
+                </div>
+                <div style="width: 50%; float: right;">
+                    <span class="heading">Evolves to</span><br>
+                    <span class="value">{{ response["evolves_to"] }}</span>
+                </div>
+                <br><br><br><br>
             </div>
         </div>
         <br><br><br><br>
