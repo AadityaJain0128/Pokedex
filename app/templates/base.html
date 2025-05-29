@@ -26,7 +26,7 @@
         .app-container {
             position: relative;
             width: 100%;
-            height: calc(100vh - 56px); /* Adjust height to account for navbar */
+            height: calc(100vh - 56px);
             overflow: hidden;
         }
         .background-container {
@@ -55,8 +55,8 @@
             height: auto;
             object-fit: contain;
             object-position: top;
-            z-index: 1; /* Add this to make the top image appear on top of the content */
-            position: fixed; /* Add this to fix the top image at the top of the screen */
+            z-index: 1;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
@@ -69,7 +69,7 @@
             z-index: 2;
             height: 100%;
             overflow-y: auto;
-            overflow-y: auto; /* Add this to make the content scrollable */
+            overflow-y: auto;
             padding-top: 100px;
         }
         #flashed_messages {
@@ -84,16 +84,16 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            z-index: 1000; /* Ensure it is above other content */
-            background-color: #f8f9fa; /* Background color of the navbar */
+            z-index: 1000;
+            background-color: #f8f9fa;
         }
         .navbar-nav .nav-link {
-            padding: 0.5rem 1rem; /* Adjust padding as needed */
+            padding: 0.5rem 1rem;
         }
         @media (min-width: 768px) {
             .app-container {
                 width: 375px;
-                height: calc(812px - 56px); /* Adjust height for iPhone X, subtract navbar height */
+                height: calc(812px - 56px);
                 position: absolute;
                 top: 50%;
                 left: 50%;
@@ -103,7 +103,7 @@
     </style>
     <title>{% block title %}{% endblock title %} - Pokedex</title>
 </head>
-<body>
+<body data-bs-theme="dark">
     <div class="app-container">
         <div class="background-container">
             <!-- Background Image -->
@@ -126,12 +126,12 @@
             </div>
             <div style="margin-top: 20vh;">
                 {% block body %}
-                <!-- Your main content goes here -->
+                
                 {% endblock body %}
             </div>
         </div>
     </div>
-    <!-- Bottom Navbar -->
+    
     <nav class="navbar navbar-expand navbar-danger bg-danger navbar-bottom">
         <div class="container-fluid">
             <ul class="navbar-nav w-100">
