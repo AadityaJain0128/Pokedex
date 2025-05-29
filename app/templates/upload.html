@@ -47,18 +47,30 @@
         const context = canvas.getContext('2d');
 
         let count = 1;
-        navigator.mediaDevices.enumerateDevices()
+        navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+            // Set the stream to the video element
+            video.srcObject = stream;
+
+            // Now enumerate devices
+            return navigator.mediaDevices.enumerateDevices();
+        })
         .then(devices => {
             const cameras = devices.filter(device => device.kind === 'videoinput');
             const cameraSelect = document.getElementById('camera-select');
+            cameraSelect.innerHTML = ''; // Clear existing options
             cameras.forEach(camera => {
                 const option = document.createElement('option');
                 option.value = camera.deviceId;
-                option.text = "Camera" + count;
-                count ++;
+                option.text = `Camera ${count}`;
+                count++;
                 cameraSelect.appendChild(option);
             });
+        })
+        .catch(error => {
+            console.error("Error accessing camera or enumerating devices:", error);
         });
+
 
         let lastUsedCameraId = null;
         document.getElementById('camera-select').addEventListener('change', () => {
