@@ -72,6 +72,7 @@ def fetch_response(img_path, folder):
     }
 
     res = requests.post(API_URL, headers=headers, json=payload)
+    print(res)
     res = res.json()["choices"][0]["message"]["content"]
     
     l, r = res.find("{"), res.rfind("}") + 1
