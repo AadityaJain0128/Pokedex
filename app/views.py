@@ -20,10 +20,7 @@ def upload():
             return redirect(url_for("views.upload"))
 
         filename = image.filename
-        if "." not in filename:
-            ext = "png"
-        else:
-            ext = filename.rsplit(".", 1)[-1].lower()
+        ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else "png"
 
         if ext not in ["jpg", "jpeg", "png", "webp"]:
             flash("Format not supported!", category="danger")
@@ -42,17 +39,16 @@ def upload():
 
         response, audio_path = fetch_response(image_path, current_app.static_folder)
 
-        session["data"] = response, image_path, audio_path
+        session["data"] = response, f"uploaded/{n}.{ext}", audio_path
         return redirect(url_for("views.details"))
 
     return render_template("upload.html")
 
 
-
 @views.route("/details")
 def details():
-    if not session.get("data", None):
-        flash("No Recent Pokemons !", category="warning")
+    if not session.get("data"):
+        flash("No Recent Pokemons!", category="warning")
         return redirect("/")
     response, image_path, audio_path = session["data"]
     return render_template("details.html", response=response, image_path=image_path, audio_path=audio_path)
