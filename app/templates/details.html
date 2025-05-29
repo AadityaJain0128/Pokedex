@@ -2,15 +2,13 @@
 {% block title %}{{ response["name"] }}'s Details{% endblock title %}
 {% block body %}
     <div class="container-fluid">
-        <!-- Flex container for image and name -->
         <div class="row">
-            <!-- Image section -->
             <div class="col-md-7 d-flex justify-content-center">
                 <img src="{{ url_for('static', filename=image_path) }}" 
                      alt="{{ response['name'] }}"
                      style="width: 200px; height: 200px; border-radius: 50%; border: 2px solid black; object-fit: cover;">
             </div>
-            <!-- Name section -->
+            
             <div class="col-md-5 d-flex flex-column justify-content-center">
                 <div>
                     <span class="heading" style="font-size: 23px;">Name</span><br>
@@ -21,7 +19,7 @@
 
         <audio src="{{ url_for('static', filename=audio_path) }}" class="mt-1" autoplay controls></audio>
 
-        <!-- Description section -->
+
         <div id="results" class="mt-1">
             <div>
                 <span class="heading">Description</span><br>
@@ -46,16 +44,17 @@
             <div>
                 <span class="heading">Health</span><br>
                 <span class="value">{{ response["health"] }}</span>
+                <br>
             </div>
         </div>
-        <br><br><br>
+        <br><br><br><br>
     </div>
     <style>
         .img-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 200px; /* Ensure the height matches your image height */
+            height: 200px;
         }
         .img-container img {
             max-width: 100%;
